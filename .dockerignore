@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# Environment
+.env
+.env.prod
+
+# Database
+data/
+*.db
+*.sqlite3
+
+# Git
+.git/
+.gitignore
+
+# Docker
+.dockerignore
+docker-compose*.yml
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Tests
+.pytest_cache/
+htmlcov/
+.coverage
