@@ -47,8 +47,11 @@ footer {
 
 section { /** horizontal flexbox */
   display: flex;
+  gap: 20px;
 }
 
 .box {
   border: 1px solid gray;
+  width: 80vw;
+  height: 70vh;
 }

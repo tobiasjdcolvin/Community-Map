@@ -1,37 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Community Map Health</title>
-	<link rel="stylesheet" href="/static/index.css">
-	<link rel="icon" type="image/svg+xml" href="/static/logo.svg">
-	<script src="/static/index.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Map Health</title>
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Your files -->
+    <link rel="stylesheet" href="/static/index.css">
+    <link rel="icon" type="image/svg+xml" href="/static/logo.svg">
+    <script src="/static/index.js" defer></script>
 </head>
 <body>
-	<header>
-		<h1>Community Map Health</h1>
-	</header>
-
-	<main>
-		<p>Main content</p>
-		<section>
-			<div>
-				<h2>Map</h2>
-				<div class="box">
+    <header>
+        <h1>Community Map Health</h1>
+    </header>
+    <main>
+        <p>Main content</p>
+        <section>
+            <div>
+                <h2>Map</h2>
+                <div class="box" id="map">
                     <p>Map info</p>
-				</div>
-			</div>
-			<select title="feature">
-				<option>Diseases</option>
-				<option>Symptoms</option>
-			</select>
-		</section>
-	</main>
-
-	<footer>
-		<p>&copy; 2026 Hack Arizona Team Name</p>
-		<p>Joseph Hill, Tobias Colvin, Sean McCormick, Lucia Alday</p>
-	</footer>
+                </div>
+            </div>
+            <div>
+                <select title="feature">
+                    <option>Diseases</option>
+                    <option>Symptoms</option>
+                </select>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>Authentic Idiocracy &copy; 2026 Hack Arizona</p>
+        <p>Joseph Hill, Tobias Colvin, Sean McCormick, Lucia Alday</p>
+    </footer>
 </body>
 </html>
