@@ -1,0 +1,54 @@
+:root {
+  --green: #a0f090;
+  --ocean: #12476c;
+  --blue: #2371a5;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+nav {
+  color: #a0f090;
+}
+
+header {
+  background-color: var(--ocean);
+  margin: 0;
+  top: 0;
+  position: sticky;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+header h1 {
+  margin: 0;
+}
+
+main {
+  flex: 1;
+  background: linear-gradient(to bottom, #ffffff, #c0c0c0);
+  padding: 20px;
+}
+
+footer {
+  padding: 1px;
+  text-align: center;
+  background-color: #a9b8a7;
+}
+
+section { /** horizontal flexbox */
+  display: flex;
+}
+
+.box {
+  border: 1px solid gray;
+}
