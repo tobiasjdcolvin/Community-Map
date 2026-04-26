@@ -42,7 +42,7 @@
         </section>
         <form id = "symptoms-form">
             <h3>Have you experienced any of the following in the last 24 hours?</h3>
-            <section>
+            <div class="container">
                 <div class="column">
                     <h4>Oral/Respiratory</h4>
                     <label>
@@ -81,15 +81,16 @@
                     </label>
                 </div>
                 <div class="column">
-                    <h4>Recent Activity</h4>
+                    <h4>Recent Activity (within the past month)</h4>
                     <label>
                         <input type="checkbox" id="attending_a_recent_mass_gathering"> Attended a mass gethering (20+) 
                     </label>
                     <label>
-                        <input type="checkbox" id="history_of_travel"> Travel in the past month
+                        <input type="checkbox" id="history_of_travel"> Travel to another state/province
                     </label>
+                    <input type="text" id="travel_city" placeholder="If so, what city?"/>
                 </div>
-            </section>
+            </div>
             <label>
                 <button type="submit" id="submit-btn"> Submit Survey </button>
             </label>

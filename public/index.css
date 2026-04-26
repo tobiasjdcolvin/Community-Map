@@ -76,10 +76,18 @@ legend {
 .column {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
+  text-align: left;
+  border-radius: 15px;
+  background-color: #2371a520;
+  border: 1px dotted #2371a5;
+  padding: 10px 20px;
 }
 .column label {
   display: block;
+}
+.column input[type="text"] {
+  margin: 5px 10px 5px 30px;
 }
 .color {
   border-radius: 100%;
@@ -90,6 +98,14 @@ legend {
 }
 section {
   width: 90vw;
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.container {
   display: flex;
   gap: 20px;
   align-items: stretch;
@@ -118,10 +134,10 @@ select {
 }
 form {
   background-color: #112c3e;
-  border-radius: 15px;
+  border-radius: 25px;
   margin: 20px 0;
   padding: 20px;
-  border: 1px solid #12476c;
+  border: 1px dotted #12476c;
 }
 
 .pair {
