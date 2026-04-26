@@ -7,6 +7,7 @@
 html, body {
   margin: 0;
   padding: 0;
+  color: white;
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
@@ -16,18 +17,15 @@ body {
   flex-direction: column;
 }
 
-nav {
-  color: #a0f090;
-}
-
 header {
-  background-color: var(--ocean);
+  box-shadow: 0 0 5px #12476c;
+  background: linear-gradient(to bottom left, var(--ocean), var(--blue));
   margin: 0;
   top: 0;
   position: sticky;
-  color: white;
   padding: 20px;
   text-align: center;
+  z-index: 100000;
 }
 header h1 {
   margin: 0;
@@ -35,23 +33,88 @@ header h1 {
 
 main {
   flex: 1;
-  background: linear-gradient(to bottom, #ffffff, #c0c0c0);
-  padding: 20px;
+  background: linear-gradient(to bottom, #303030, #1c1c1c);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 90vw;
+  padding: 5vh 5vw;
+  gap: 20px;
+}
+
+input {
+  background-color: #f0f0f040;
+  color: white;
+  border: 1px solid #859dad;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+article {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+legend {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #859dad;
+  background-color: #596b77;
+  border-radius: 10px;
+  padding: 10px;
+  flex: 1;
+}
+
+.color {
+  border-radius: 100%;
+  min-width: 10px;
+  min-height: 10px;
+  border-width: 1px;
+  border-style: solid;
+}
+section {
+  width: 90vw;
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+  justify-content: space-between;
 }
 
 footer {
   padding: 1px;
   text-align: center;
-  background-color: #a9b8a7;
+  background: linear-gradient(to bottom right,#4d544c, #343e33);
 }
-
-section { /** horizontal flexbox */
-  display: flex;
-  gap: 20px;
+select {
+  background-color: #596b77;
+  color: white;
+  border: 1px solid #859dad;
+  border-radius: 5px;
 }
 
 .box {
   border: 1px solid gray;
-  width: 80vw;
   height: 70vh;
+  border-radius: 15px;
+  box-shadow: 0 0 10px #12476c;
+  flex: 1;
+}
+form {
+  background-color: #112c3e;
+  border-radius: 15px;
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid #12476c;
+  width: 90vw;
+}
+
+.pair {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
