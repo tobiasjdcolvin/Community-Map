@@ -24,7 +24,13 @@ app.mount("/static", StaticFiles(directory="public"), name="static")
 
 @app.post("/api/symptoms")
 def set_symptoms(symptoms: SymptomsIn):
-    print(symptoms.model_dump())
+    valid_parameters = []
+
+    for name, val in symptoms.model_dump().items():
+        if (val == True):
+            print(f"{name}: {val}")
+            valid_parameters.append(name)
+
     return {"received": symptoms.model_dump()}
 
 @app.get("/")
