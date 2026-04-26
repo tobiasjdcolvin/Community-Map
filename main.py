@@ -12,6 +12,12 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+VALID_SYMPTOMS = {
+    "cough_congestion", "nausea_vomiting", "difficulty_breathing",
+    "sore_throat", "rash", "fever", "chills", "diarrhea",
+    "attending_a_recent_mass_gathering", "history_of_travel"
+}
+
 class SymptomsIn(BaseModel):
     cough_congestion: bool
     nausea_vomiting: bool
@@ -46,9 +52,13 @@ def root():
     return FileResponse("public/index.html")
 
 @app.get("/api/locations")
-def get_locations():
-    rows = db.get_all_coordinates_and_response_counts()
-    return [{"lat": lat, "lon": lon, "count": count} for lat, lon, count in rows]
+def get_locations(symptom: str = None):
+    if symptom and symptom not in VALID_SYMPTOMS:
+        raise HTTPException(status_code=400, detail="Invalid symptom")
+    
+    symptoms_filter = [symptom] if symptom else []
+    rows = db.get_all_coordinates_and_response_counts_filtered_by_symptoms(symptoms_filter)
+    return [{"lat": r[0], "lon": r[1], "count": r[2]} for r in rows]
 
 @app.get("/test")
 def loading_page():
