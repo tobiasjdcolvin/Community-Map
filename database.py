@@ -5,31 +5,17 @@ import time
 
 # How to use this file:
 
-conn = sql.connect('data/database.db')
-c = conn.cursor()
 
-# Initialization
-c.execute("CREATE TABLE IF NOT EXISTS countries (countryid INTEGER PRIMARY KEY, dname TEXT, lat REAL, lon REAL, UNIQUE(dname))")
-c.execute("CREATE TABLE IF NOT EXISTS cities (cid INTEGER PRIMARY KEY, cname TEXT, cstate TEXT, countryid INTEGER REFERENCES countries (countryid), lat REAL, lon REAL, UNIQUE(cname, cstate, countryid))")
-c.execute("CREATE TABLE IF NOT EXISTS responses (rid INTEGER PRIMARY KEY, cid INTEGER REFERENCES cities (cid), \
-date_of_report TEXT,\
-cough_congestion INTEGER,\
-nausea_vomiting INTEGER,\
-difficulty_breathing INTEGER,\
-sore_throat INTEGER,\
-rash INTEGER,\
-fever INTEGER,\
-chills INTEGER,\
-diarrhea INTEGER,\
-red_eyes INTEGER,\
-attending_a_recent_mass_gathering INTEGER,\
-history_of_travel INTEGER)")
+
+
 
 # Add countries
 
 
 # Adds a city into the database
 def add_city(cname, state, country): 
+    conn = sql.connect('data/database.db')
+    c = conn.cursor()
     time.sleep(1.5)
     result = n.searchlocation(city=cname, state=state, country=country)
     if (result):
@@ -39,6 +25,8 @@ def add_city(cname, state, country):
         return False
 
 def insert_city_to_db(result):
+    conn = sql.connect('data/database.db')
+    c = conn.cursor()
     # Sanitize input
     vals = result["display_name"].split(",")
     if len(vals) == 2:
@@ -65,9 +53,14 @@ def insert_city_to_db(result):
     return True
 
 def add_response(city="", state="", country="", date=None, values=[]):
+    conn = sql.connect('data/database.db')
+    c = conn.cursor()
     # Query the nominatim API to create a city entry if it doesn't exist, and get the cityid for the response
     time.sleep(1.5)
     result = n.searchlocation(city=city, state=state, country=country)
+    if not result:
+        print(f"ERROR: API call failed for searchlocation({city}, {state}, {country}). Cannot add response.")
+        return False
 
     if result:
         city = result.get('display_name').split(",")[0].strip()
@@ -105,8 +98,6 @@ def add_response(city="", state="", country="", date=None, values=[]):
             print(f"WARNING: '{val}' is not a recognized parameter and will be ignored.")
             
     try:
-        # Build the final tuple to insert, keeping the strict order of valid_parameters
-        # We start with cityid and date, then append the 11 parameter values
         insert_values = (cityid, date) + tuple(param_states[param] for param in valid_parameters)
         
         c.execute('''
@@ -135,6 +126,24 @@ def add_response(city="", state="", country="", date=None, values=[]):
         return False
 
 def build_countries():
+    conn = sql.connect('data/database.db')
+    c = conn.cursor()
+    # Initialization
+    c.execute("CREATE TABLE IF NOT EXISTS countries (countryid INTEGER PRIMARY KEY, dname TEXT, lat REAL, lon REAL, UNIQUE(dname))")
+    c.execute("CREATE TABLE IF NOT EXISTS cities (cid INTEGER PRIMARY KEY, cname TEXT, cstate TEXT, countryid INTEGER REFERENCES countries (countryid), lat REAL, lon REAL, UNIQUE(cname, cstate, countryid))")
+    c.execute("CREATE TABLE IF NOT EXISTS responses (rid INTEGER PRIMARY KEY, cid INTEGER REFERENCES cities (cid), \
+    date_of_report TEXT,\
+    cough_congestion INTEGER,\
+    nausea_vomiting INTEGER,\
+    difficulty_breathing INTEGER,\
+    sore_throat INTEGER,\
+    rash INTEGER,\
+    fever INTEGER,\
+    chills INTEGER,\
+    diarrhea INTEGER,\
+    red_eyes INTEGER,\
+    attending_a_recent_mass_gathering INTEGER,\
+    history_of_travel INTEGER)")
     # Check if the countries have been populated
     c.execute("SELECT COUNT(*) FROM countries")
     row_count = c.fetchone()[0]
@@ -157,6 +166,8 @@ def build_countries():
 
 
 def get_country_id(dname):
+    conn = sql.connect('data/database.db')
+    c = conn.cursor()
     # Query nominatim for the proper country name and insert it into the database if it doesn't exist, then return the countryid
     time.sleep(1.5)
     result = n.searchlocation(country=dname)
@@ -183,9 +194,16 @@ build_countries()
 #==========================================================================================================
 
 def get_num_responses_by_city(city, state=None, country=None):
+    conn = sql.connect('data/database.db')
+    c = conn.cursor()
     # Query nominatim for the correct city name
     time.sleep(1.5)
     result = n.searchlocation(city=city, state=state, country=country)
+    
+    if not result:
+        print(f"ERROR: API call failed for searchlocation({city}, {state}, {country}). Cannot get number of responses.")
+        return None
+
     result_city = result.get('display_name').split(",")[0].strip() if result else city
 
     c.execute('''
@@ -197,6 +215,8 @@ def get_num_responses_by_city(city, state=None, country=None):
     return c.fetchone()[0]
 
 def get_all_coordinates_and_response_counts():
+    conn = sql.connect('data/database.db')
+    c = conn.cursor()
     # Returns a list of tuples (lat, lon, response_count) for all cities in the database
     c.execute('''
         SELECT cities.lat, cities.lon, COUNT(responses.rid) as response_count
@@ -207,6 +227,8 @@ def get_all_coordinates_and_response_counts():
     return c.fetchall()
 
 def get_all_coordinates_and_response_counts_filtered_by_symptoms(symptoms=[]):
+    conn = sql.connect('data/database.db')
+    c = conn.cursor()
     # Returns a list of tuples (lat, lon, response_count) for all cities in the database, filtered by symptoms
     if len(symptoms) == 0:
         return get_all_coordinates_and_response_counts()
@@ -229,7 +251,28 @@ def get_all_coordinates_and_response_counts_filtered_by_symptoms(symptoms=[]):
     c.execute(query)
     return c.fetchall()
 
-
+def get_all_coordinates_and_response_counts_filtered_by_age_and_symptoms(max_age=-1, symptoms=[]):
+    conn = sql.connect('data/database.db')
+    c = conn.cursor()
+    curr_date = time.strftime("%Y-%m-%d")
+    # Returns a list of tuples (lat, lon, response_count) for all cities in the database, filtered by symptoms and age
+    if len(symptoms) == 0 and max_age == -1:
+        return get_all_coordinates_and_response_counts()
+    where_clauses = []
+    if max_age != -1:
+        where_clauses.append(f"date_of_report >= date('{curr_date}', '-{max_age} days')")
+    for symptom in symptoms:
+        where_clauses.append(f"{symptom} = 1")
+    where_statement = " AND ".join(where_clauses)
+    query = f'''
+        SELECT cities.lat, cities.lon, COUNT(responses.rid) as response_count
+        FROM cities
+        LEFT JOIN responses ON cities.cid = responses.cid
+        WHERE {where_statement}
+        GROUP BY cities.cid
+    '''
+    c.execute(query)
+    return c.fetchall()
 
 if __name__ == "__main__":
     # Example usage of get_num_responses_by_city from pukalani, HI
@@ -242,4 +285,8 @@ if __name__ == "__main__":
 
     print("\nAll coordinates and response counts filtered by symptoms (fever and cough_congestion):")
     for lat, lon, count in get_all_coordinates_and_response_counts_filtered_by_symptoms(symptoms=["fever", "cough_congestion"]):
+        print(f"Coordinates: ({lat}, {lon}), Response Count: {count}")
+
+    print("\nAll coordinates and response counts filtered by symptoms (fever and cough_congestion) and age (max_age=10):")
+    for lat, lon, count in get_all_coordinates_and_response_counts_filtered_by_age_and_symptoms(max_age=10, symptoms=["fever", "cough_congestion"]):
         print(f"Coordinates: ({lat}, {lon}), Response Count: {count}")
