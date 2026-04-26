@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+import database as db
 
 DATABASE = "./data/myapp.db"
 
@@ -36,3 +37,8 @@ def set_symptoms(symptoms: SymptomsIn):
 @app.get("/")
 def root():
     return FileResponse("public/index.html")
+
+@app.get("/api/locations")
+def get_locations():
+    rows = db.get_all_coordinates_and_response_counts()
+    return [{"lat": lat, "lon": lon, "count": count} for lat, lon, count in rows]
