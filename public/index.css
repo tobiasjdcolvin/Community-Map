@@ -138,6 +138,7 @@ button {
   background-color: #12476c;
   border: 1px solid #2371a5;
   transition: 0.3s ease;
+  border-radius: 10px;
 }
 
 button:hover {
