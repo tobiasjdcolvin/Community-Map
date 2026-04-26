@@ -32,24 +32,69 @@ document.getElementById("symptoms-form").addEventListener("submit", async (e) =>
   window.location.href = "/test";
 });
 
-const users = [
-  { lat: 47.6062, lng: -122.3321, label: "Seattle" },
-  { lat: 51.5074, lng: -0.1278,   label: "London" },
-  { lat: 35.6762, lng: 139.6503,  label: "Tokyo" },
-  { lat: -33.8688, lng: 151.2093, label: "Sydney" },
-  { lat: 48.8566, lng: 2.3522,    label: "Paris" },
-  { lat: 40.7128, lng: -74.0060,  label: "New York" },
-];
+const SYMPTOM_COLORS = {
+    cough_congestion:                { fill: '#4E9AF1', border: '#1A5FAD' },
+    nausea_vomiting:                 { fill: '#F4A623', border: '#B8720A' },
+    difficulty_breathing:            { fill: '#E05C5C', border: '#9E2020' },
+    sore_throat:                     { fill: '#9B59B6', border: '#6C3483' },
+    rash:                            { fill: '#2ECC71', border: '#1A7A44' },
+    fever:                           { fill: '#E74C3C', border: '#922B21' },
+    chills:                          { fill: '#1ABC9C', border: '#0E6655' },
+    diarrhea:                        { fill: '#E67E22', border: '#935116' },
+    attending_a_recent_mass_gathering: { fill: '#F1C40F', border: '#9A7D0A' },
+    history_of_travel:               { fill: '#EC407A', border: '#880E4F' },
+};
 
-users.forEach(u => {
-  L.circleMarker([u.lat, u.lng], {
-    radius: 8,
-    fillColor: '#378ADD',
-    color: '#185FA5',
-    weight: 1.5,
-    fillOpacity: 0.8
-  }).bindPopup(u.label).addTo(map);
+
+// One layer group per symptom
+const symptomLayers = {};
+Object.keys(SYMPTOM_COLORS).forEach(symptom => {
+    symptomLayers[symptom] = L.layerGroup().addTo(map);
 });
+
+async function loadMarkers() {
+    // Clear all layers
+    Object.values(symptomLayers).forEach(layer => layer.clearLayers());
+
+    // Fetch all symptoms in parallel
+    const fetches = Object.keys(SYMPTOM_COLORS).map(symptom =>
+        api(`/api/locations?symptom=${symptom}`).then(locations => ({ symptom, locations }))
+    );
+
+    const results = await Promise.all(fetches);
+
+    results.forEach(({ symptom, locations }) => {
+        const { fill, border } = SYMPTOM_COLORS[symptom];
+        locations.forEach(u => {
+            L.circleMarker([u.lat, u.lon], {
+                radius: 8,
+                fillColor: fill,
+                color: border,
+                weight: 1.5,
+                fillOpacity: 0.6,  // slight transparency helps overlapping markers show through
+            })
+            .bindPopup(`<b>${symptom.replaceAll('_', ' ')}</b><br>Reports: ${u.count}`)
+            .addTo(symptomLayers[symptom]);
+        });
+    });
+}
+
+/*
+async function loadMarkers() {
+    markerLayer.clearLayers()
+    const locations = await api("/api/locations")
+    locations.forEach(u => {
+        L.circleMarker([u.lat, u.lon], {
+            radius: 8,
+            fillColor: '#378ADD',
+            color: '#185FA5',
+            weight: 1.5,
+            fillOpacity: 0.8
+        }).bindPopup(`Reports: ${u.count}`).addTo(markerLayer)
+    })
+}
+*/
+
 
 async function api(path, options = {}) {
     const res = await fetch(path, {
