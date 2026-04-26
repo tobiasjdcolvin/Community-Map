@@ -9,19 +9,7 @@ c = conn.cursor()
 c.execute("CREATE TABLE IF NOT EXISTS countries (countryid INTEGER PRIMARY KEY, dname TEXT, lat REAL, lon REAL, UNIQUE(dname))")
 c.execute("CREATE TABLE IF NOT EXISTS cities (cid INTEGER PRIMARY KEY, cname TEXT, cstate TEXT, countryid INTEGER REFERENCES countries (countryid), lat REAL, lon REAL, UNIQUE(cname, cstate, countryid))")
 c.execute("CREATE TABLE IF NOT EXISTS responses (rid INTEGER PRIMARY KEY, cid INTEGER REFERENCES cities (cid), \
-age INTEGER,\
-sex TEXT,\
-email TEXT,\
-unique_id TEXT,\
-occupation TEXT,\
 date_of_report TEXT,\
-postal_code TEXT,\
-phone_number TEXT,\
-household_member_id TEXT,\
-geographical_coordinates TEXT,\
-no_symptoms INTEGER,\
-symptoms TEXT,\
-date_of_illness TEXT,\
 cough_congestion INTEGER,\
 nausea_vomiting INTEGER,\
 difficulty_breathing INTEGER,\
@@ -30,47 +18,118 @@ rash INTEGER,\
 fever INTEGER,\
 chills INTEGER,\
 diarrhea INTEGER,\
-bleeding_from_body_openings INTEGER,\
 red_eyes INTEGER,\
-muscle_or_body_aches_and_pains INTEGER,\
-discolored_or_bloody_urine INTEGER,\
-loss_of_smell_or_taste INTEGER,\
-yellow_skin_yellow_eyes INTEGER,\
-absent_from_work INTEGER,\
-absent_from_school INTEGER,\
-did_you_seek_health_care_or_treatment INTEGER,\
 attending_a_recent_mass_gathering INTEGER,\
-tick_or_insect_bite INTEGER,\
-animal_bite INTEGER,\
 history_of_travel INTEGER)")
 
 # Add countries
 
 
 # Adds a city into the database
-def add_city(cname, cstate, countryid):
-    result = n.searchlocation(city=cname, cstate=cstate, country=countryid)
+def add_city(cname, state, country): 
+    time.sleep(1.5)
+    result = n.searchlocation(city=cname, state=state, country=country)
     if (result):
-        c.execute(f"INSERT INTO cities (cname, cstate, countryid)")
+        return insert_city_to_db(result)
     else:
-        print(f"ERROR: API call failed for searchlocation({cname}, {cstate}, {countryid}).")
+        print(f"ERROR: API call failed for searchlocation({cname}, {state}, {country}).")
         return False
-    return True
 
 def insert_city_to_db(result):
     # Sanitize input
-    vals = result["display_name"].split(",").strip()
+    vals = result["display_name"].split(",")
     if len(vals) == 2:
-        cname = vals[0]
-        cstate = ""
-        countryid = get_country_id()
+        cname = vals[0].strip()
+        cstate = "".strip()
+        countryid = get_country_id(vals[-1])
+    elif len(vals) > 2:
+        cname = vals[0].strip()
+        cstate = vals[-2].strip()
+        countryid = get_country_id(vals[-1])
+    else:
+        print("City isn't part of a country?")
+        return False
+    lon = float(result["lon"])
+    lat = float(result["lat"])
+    
 
     if (result):
-        c.execute(f"INSERT INTO cities (cname, cstate, countryid) VALUES ")
+        c.execute(f"INSERT OR IGNORE INTO cities (cname, cstate, countryid, lon, lat) VALUES (?, ?, ?, ?, ?)", (cname, cstate, countryid, lon, lat))
+        conn.commit()
     else:
-        print(f"ERROR: API call failed for searchlocation({cname}, {cstate}, {countryid}).")
+        print(f"ERROR: API call failed for searchlocation({cname}, {cstate}, {countryid}, {lon}, {lat}).")
         return False
     return True
+
+def add_response(city, state, country, date, values):
+    # Query the nominatim API to create a city entry if it doesn't exist, and get the cityid for the response
+    time.sleep(1.5)
+    result = n.searchlocation(city=city, state=state, country=country)
+
+    if result:
+        city = result.get('display_name').split(",")[0].strip()
+        state = result.get('display_name').split(",")[-2].strip() if len(result.get('display_name').split(",")) > 2 else ""
+        country = result.get('display_name').split(",")[-1].strip()
+        insert_city_to_db(result)
+        cityid = c.execute("SELECT cid FROM cities WHERE cname = ? AND cstate = ? AND countryid = ?", (city.strip(), state.strip(), get_country_id(country))).fetchone()[0]
+    else:
+        print(f"ERROR: API call failed for searchlocation({city}, {state}, {country}). Cannot add response.")
+        return False
+
+    # Define the exact column names as they appear in the database schema
+    valid_parameters = [
+        "cough_congestion", 
+        "nausea_vomiting", 
+        "difficulty_breathing", 
+        "sore_throat", 
+        "rash", 
+        "fever", 
+        "chills", 
+        "diarrhea", 
+        "red_eyes", 
+        "attending_a_recent_mass_gathering", 
+        "history_of_travel"
+    ]
+    
+    # Initialize a dictionary mapping every parameter to 0 (False)
+    param_states = {param: 0 for param in valid_parameters}
+    
+    # Loop through the provided list and set present parameters to 1 (True)
+    for val in values:
+        if val in param_states:
+            param_states[val] = 1
+        else:
+            print(f"WARNING: '{val}' is not a recognized parameter and will be ignored.")
+            
+    try:
+        # Build the final tuple to insert, keeping the strict order of valid_parameters
+        # We start with cityid and date, then append the 11 parameter values
+        insert_values = (cityid, date) + tuple(param_states[param] for param in valid_parameters)
+        
+        c.execute('''
+            INSERT INTO responses (
+                cid, 
+                date_of_report, 
+                cough_congestion, 
+                nausea_vomiting, 
+                difficulty_breathing, 
+                sore_throat, 
+                rash, 
+                fever, 
+                chills, 
+                diarrhea, 
+                red_eyes, 
+                attending_a_recent_mass_gathering, 
+                history_of_travel
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', insert_values)
+        
+        conn.commit()
+        return True
+        
+    except sql.Error as e:
+        print(f"ERROR: Database error when adding response: {e}")
+        return False
 
 def build_countries():
     # Check if the countries have been populated
@@ -95,11 +154,26 @@ def build_countries():
 
 
 def get_country_id(dname):
-    c.execute()
+    # Query nominatim for the proper country name and insert it into the database if it doesn't exist, then return the countryid
+    time.sleep(1.5)
+    result = n.searchlocation(country=dname)
+    if result:
+        c.execute("INSERT OR IGNORE INTO countries (dname, lat, lon) VALUES (?, ?, ?)", (result.get('display_name'), result.get('lat'), result.get('lon')))
+        conn.commit()
+    else:        
+        print(f"ERROR: API call failed for searchlocation({dname}). Cannot get country ID.")
+        return None
+    
+    # Now that we are sure the country is in the database, query for its ID and return it
+    dname = result.get('display_name')
+
+    return c.execute("SELECT countryid FROM countries WHERE dname = ?", (dname.strip(),)).fetchone()[0]
 
 # Initialize countries
 build_countries()
 
 
-
+if __name__ == "__main__":
+    add_city(cname="Pukalani", country="US", state="HI")
+    add_response(city="Pukalani", state="HI", country="US", date="2024-06-01", values=["cough_congestion", "fever", "diarrhea"])
 
