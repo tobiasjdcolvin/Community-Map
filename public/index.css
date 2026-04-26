@@ -88,7 +88,6 @@ legend {
   background-color: #596b77;
   border-radius: 5px;
   padding: 10px;
-  flex: 1;
 }
 .column {
   display: flex;
@@ -111,6 +110,10 @@ legend {
   border-radius: 100%;
   min-width: 15px;
   min-height: 15px;
+  width: 15px;
+  height: 15px;
+  max-width: 15px;
+  max-height: 15px;
   border-width: 1px;
   border-style: solid;
 }
@@ -144,7 +147,7 @@ select {
 }
 
 .box {
-  border: 1px solid gray;
+  border: 2px solid #859dad;
   height: 70vh;
   border-radius: 15px;
   box-shadow: 0 0 10px #12476c;

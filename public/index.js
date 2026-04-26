@@ -1,4 +1,8 @@
-const map = L.map('map').setView([20, 0], 2);
+const map = L.map('map', {
+    minZoom: 2,
+    maxBounds: [[-90, -180], [90, 180]],
+    maxBoundsViscosity: 1.0
+}).setView([20, 0], 2);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
@@ -32,6 +36,54 @@ document.getElementById("symptoms-form").addEventListener("submit", async (e) =>
   window.location.href = "/test";
 });
 
+const SYMPTOM_COLORS = {
+    cough_congestion:                { fill: '#4E9AF1', border: '#1A5FAD' },
+    nausea_vomiting:                 { fill: '#F4A623', border: '#B8720A' },
+    difficulty_breathing:            { fill: '#E05C5C', border: '#9E2020' },
+    sore_throat:                     { fill: '#9B59B6', border: '#6C3483' },
+    rash:                            { fill: '#2ECC71', border: '#1A7A44' },
+    fever:                           { fill: '#E74C3C', border: '#922B21' },
+    chills:                          { fill: '#1ABC9C', border: '#0E6655' },
+    diarrhea:                        { fill: '#E67E22', border: '#935116' },
+    attending_a_recent_mass_gathering: { fill: '#F1C40F', border: '#9A7D0A' },
+    history_of_travel:               { fill: '#EC407A', border: '#880E4F' },
+};
+
+
+// One layer group per symptom
+const symptomLayers = {};
+Object.keys(SYMPTOM_COLORS).forEach(symptom => {
+    symptomLayers[symptom] = L.layerGroup().addTo(map);
+});
+
+async function loadMarkers() {
+    // Clear all layers
+    Object.values(symptomLayers).forEach(layer => layer.clearLayers());
+
+    // Fetch all symptoms in parallel
+    const fetches = Object.keys(SYMPTOM_COLORS).map(symptom =>
+        api(`/api/locations?symptom=${symptom}`).then(locations => ({ symptom, locations }))
+    );
+
+    const results = await Promise.all(fetches);
+
+    results.forEach(({ symptom, locations }) => {
+        const { fill, border } = SYMPTOM_COLORS[symptom];
+        locations.forEach(u => {
+            L.circleMarker([u.lat, u.lon], {
+                radius: 8,
+                fillColor: fill,
+                color: border,
+                weight: 1.5,
+                fillOpacity: 0.6,  // slight transparency helps overlapping markers show through
+            })
+            .bindPopup(`<b>${symptom.replaceAll('_', ' ')}</b><br>Reports: ${u.count}`)
+            .addTo(symptomLayers[symptom]);
+        });
+    });
+}
+
+/*
 async function loadMarkers() {
     markerLayer.clearLayers()
     const locations = await api("/api/locations")
@@ -45,6 +97,7 @@ async function loadMarkers() {
         }).bindPopup(`Reports: ${u.count}`).addTo(markerLayer)
     })
 }
+*/
 
 
 async function api(path, options = {}) {
@@ -56,5 +109,3 @@ async function api(path, options = {}) {
     if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`)
     return res.json()
 }
-
-loadMarkers()
