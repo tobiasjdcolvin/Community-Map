@@ -30,7 +30,7 @@ def searchlocation(city=None, country=None, state=None):
     # IMPORTANT: Nominatim requires a descriptive User-Agent. 
     # Replace the email below with your actual contact email.
     headers = {
-        "User-Agent": "MyGeocodingScript/1.0 (bingusfartballs@wakanda.gov)" # TODO: Change email logic
+        "User-Agent": "MyGeocodingScript/1.0 (ermokthisisnotreal@ghotmail.com)" # TODO: Change email logic
     }
     
     try:
