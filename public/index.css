@@ -141,7 +141,7 @@ select {
 }
 
 .box {
-  border: 1px solid gray;
+  border: 2px solid #859dad;
   height: 70vh;
   border-radius: 15px;
   box-shadow: 0 0 10px #12476c;
