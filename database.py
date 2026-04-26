@@ -7,22 +7,7 @@ import time
 
 
 
-# Initialization
-c.execute("CREATE TABLE IF NOT EXISTS countries (countryid INTEGER PRIMARY KEY, dname TEXT, lat REAL, lon REAL, UNIQUE(dname))")
-c.execute("CREATE TABLE IF NOT EXISTS cities (cid INTEGER PRIMARY KEY, cname TEXT, cstate TEXT, countryid INTEGER REFERENCES countries (countryid), lat REAL, lon REAL, UNIQUE(cname, cstate, countryid))")
-c.execute("CREATE TABLE IF NOT EXISTS responses (rid INTEGER PRIMARY KEY, cid INTEGER REFERENCES cities (cid), \
-date_of_report TEXT,\
-cough_congestion INTEGER,\
-nausea_vomiting INTEGER,\
-difficulty_breathing INTEGER,\
-sore_throat INTEGER,\
-rash INTEGER,\
-fever INTEGER,\
-chills INTEGER,\
-diarrhea INTEGER,\
-red_eyes INTEGER,\
-attending_a_recent_mass_gathering INTEGER,\
-history_of_travel INTEGER)")
+
 
 # Add countries
 
@@ -143,6 +128,22 @@ def add_response(city="", state="", country="", date=None, values=[]):
 def build_countries():
     conn = sql.connect('data/database.db')
     c = conn.cursor()
+    # Initialization
+    c.execute("CREATE TABLE IF NOT EXISTS countries (countryid INTEGER PRIMARY KEY, dname TEXT, lat REAL, lon REAL, UNIQUE(dname))")
+    c.execute("CREATE TABLE IF NOT EXISTS cities (cid INTEGER PRIMARY KEY, cname TEXT, cstate TEXT, countryid INTEGER REFERENCES countries (countryid), lat REAL, lon REAL, UNIQUE(cname, cstate, countryid))")
+    c.execute("CREATE TABLE IF NOT EXISTS responses (rid INTEGER PRIMARY KEY, cid INTEGER REFERENCES cities (cid), \
+    date_of_report TEXT,\
+    cough_congestion INTEGER,\
+    nausea_vomiting INTEGER,\
+    difficulty_breathing INTEGER,\
+    sore_throat INTEGER,\
+    rash INTEGER,\
+    fever INTEGER,\
+    chills INTEGER,\
+    diarrhea INTEGER,\
+    red_eyes INTEGER,\
+    attending_a_recent_mass_gathering INTEGER,\
+    history_of_travel INTEGER)")
     # Check if the countries have been populated
     c.execute("SELECT COUNT(*) FROM countries")
     row_count = c.fetchone()[0]
