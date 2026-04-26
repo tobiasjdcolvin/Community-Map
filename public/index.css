@@ -64,6 +64,12 @@ input {
   flex: 1;
 }
 
+.form-input {
+  border: 1px dotted #3e8abd;
+  background-color: #2a5069;
+  color: white;
+}
+
 article {
   display: flex;
   flex-direction: column;
