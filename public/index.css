@@ -4,6 +4,10 @@
   --blue: #2371a5;
 }
 
+#hidden {
+  display: none;
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -124,7 +128,6 @@ section {
   gap: 20px;
   align-items: stretch;
   justify-content: space-between;
-  flex-wrap: wrap;
 }
 
 footer {
@@ -154,6 +157,11 @@ form {
   padding: 20px;
   border: 1px dotted #12476c;
   gap: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
 }
 
 .pair {

@@ -49,3 +49,7 @@ def root():
 def get_locations():
     rows = db.get_all_coordinates_and_response_counts()
     return [{"lat": lat, "lon": lon, "count": count} for lat, lon, count in rows]
+
+@app.get("/test")
+def loading_page():
+    return FileResponse("public/test.html")
