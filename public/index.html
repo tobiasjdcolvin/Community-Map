@@ -14,27 +14,11 @@
 </head>
 <body>
     <header>
-        <h1>Community Map Health</h1>
+        <h1>Community Health Map</h1>
     </header>
     <main>
         <section>
             <div class="box" id="map"></div>
-            <article>
-                <select title="feature">
-                    <option>Diseases</option>
-                    <option>Symptoms</option>
-                </select>
-                <legend>
-                    <div class="pair">
-                        <div class="color" style="background-color: #202038;border-color: #3e6954"></div>
-                        <h4>Attribute 1</h4>
-                    </div>
-                    <div class="pair">
-                        <div class="color" style="background-color: #284591;border-color: #465c93"></div>
-                        <h4>Attribute 2</h4>
-                    </div>
-                </legend>
-            </article>
         </section>
         <form id = "symptoms-form">
             <h2>Have you experienced any of the following in the last 24 hours?</h2>
@@ -64,7 +48,7 @@
                         <input type="checkbox" id="diarrhea"> diarrhea 
                     </label>
                 </div>
-                <div>
+
                     <div class="column">
                         <h3>General Illness</h3>
                         <label>
@@ -77,8 +61,8 @@
                             <input type="checkbox" id="rash"> rash 
                         </label>
                     </div>
-                    <div class="break"></div>
-                    <div class="column">
+
+                    <div class="column" id="hidden">
                         <h3>Recent Activity (within the past month)</h3>
                         <label>
                             <input type="checkbox" id="attending_a_recent_mass_gathering"> Attended a mass gethering (20+) 
@@ -88,7 +72,7 @@
                         </label>
                         <input class="form-input" type="text" id="travel_city" placeholder="If so, what city?"/>
                     </div>
-                </div>
+
             </div>
             <div class="break"></div>
             <div class="container">

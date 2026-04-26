@@ -1,13 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="test.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submitting...</title>
+  <link rel="icon" type="image/svg+xml" href="/static/logo.svg">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #f0f4f8;
+      font-family: sans-serif;
+      gap: 1.5rem;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid #dde3ea;
+      border-top-color: #378ADD;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    p {
+      color: #555;
+      font-size: 1.1rem;
+    }
+
+    .error {
+      color: #c0392b;
+      font-size: 0.95rem;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    TESTING BLAHBLAHBLAH
-  <div id="map"></div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="test.js"></script>
+  <div class="spinner"></div>
+  <p>Submitting your report...</p>
+  <p class="error" id="error-msg"></p>
+
+  <script>
+    async function submit() {
+      const raw = sessionStorage.getItem("pendingSubmit");
+
+      // Nothing to submit — just go home
+      if (!raw) {
+        window.location.href = "/";
+        return;
+      }
+
+      sessionStorage.removeItem("pendingSubmit");
+      const { symptoms, city, state, country } = JSON.parse(raw);
+
+      try {
+        const res = await fetch(
+          `/api/symptoms?city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&country=${encodeURIComponent(country)}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(symptoms),
+          }
+        );
+
+        if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+
+        // Success — go back to the map
+        window.location.href = "/";
+      } catch (err) {
+        // Show error and let user go back manually
+        document.querySelector(".spinner").style.display = "none";
+        document.querySelector("p").textContent = "Something went wrong.";
+        const errEl = document.getElementById("error-msg");
+        errEl.textContent = err.message;
+        errEl.style.display = "block";
+
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 3000);
+      }
+    }
+
+    submit();
+  </script>
 </body>
 </html>

@@ -3,39 +3,34 @@ const map = L.map('map').setView([20, 0], 2);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
 }).addTo(map);
+window.addEventListener('load', () => map.invalidateSize());
 
 const markerLayer = L.layerGroup().addTo(map); // add this
 
 document.getElementById("symptoms-form").addEventListener("submit", async (e) => {
-    e.preventDefault() 
-    const symptoms = {
-        cough_congestion: document.getElementById("cough_congestion").checked,
-        nausea_vomiting: document.getElementById("nausea_vomiting").checked,
-        difficulty_breathing: document.getElementById("difficulty_breathing").checked,
-        sore_throat: document.getElementById("sore_throat").checked,
-        rash: document.getElementById("rash").checked,
-        fever: document.getElementById("fever").checked,
-        chills: document.getElementById("chills").checked,
-        diarrhea: document.getElementById("diarrhea").checked,
-        attending_a_recent_mass_gathering: document.getElementById("attending_a_recent_mass_gathering").checked,
-        history_of_travel: document.getElementById("history_of_travel").checked,
-    }
+  e.preventDefault();
 
-    const city = document.getElementById("input_city").value
-    const state = document.getElementById("input_state_province").value
-    const country = document.getElementById("input_country").value
+  const symptoms = {
+    cough_congestion: document.getElementById("cough_congestion").checked,
+    nausea_vomiting: document.getElementById("nausea_vomiting").checked,
+    difficulty_breathing: document.getElementById("difficulty_breathing").checked,
+    sore_throat: document.getElementById("sore_throat").checked,
+    rash: document.getElementById("rash").checked,
+    fever: document.getElementById("fever").checked,
+    chills: document.getElementById("chills").checked,
+    diarrhea: document.getElementById("diarrhea").checked,
+    attending_a_recent_mass_gathering: document.getElementById("attending_a_recent_mass_gathering").checked,
+    history_of_travel: document.getElementById("history_of_travel").checked,
+  };
 
-    try {
-        const result = await api(`/api/symptoms?city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&country=${encodeURIComponent(country)}`, { 
-            method: "POST", 
-            body: symptoms 
-        })
-        console.log("Saved:", result)
-        loadMarkers() // refresh map after submit
-    } catch (e) {
-        console.error("Failed:", e.message)
-    }
-})
+  const city = document.getElementById("input_city").value;
+  const state = document.getElementById("input_state_province").value;
+  const country = document.getElementById("input_country").value;
+
+  // Store payload and redirect to loading page
+  sessionStorage.setItem("pendingSubmit", JSON.stringify({ symptoms, city, state, country }));
+  window.location.href = "/test";
+});
 
 async function loadMarkers() {
     markerLayer.clearLayers()
