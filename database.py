@@ -2,6 +2,9 @@ import sqlite3 as sql
 import nominatim as n
 import time
 
+
+# How to use this file:
+
 conn = sql.connect('data/database.db')
 c = conn.cursor()
 
@@ -61,7 +64,7 @@ def insert_city_to_db(result):
         return False
     return True
 
-def add_response(city, state, country, date, values):
+def add_response(city="", state="", country="", date=None, values=[]):
     # Query the nominatim API to create a city entry if it doesn't exist, and get the cityid for the response
     time.sleep(1.5)
     result = n.searchlocation(city=city, state=state, country=country)
@@ -173,7 +176,70 @@ def get_country_id(dname):
 build_countries()
 
 
-if __name__ == "__main__":
-    add_city(cname="Pukalani", country="US", state="HI")
-    add_response(city="Pukalani", state="HI", country="US", date="2024-06-01", values=["cough_congestion", "fever", "diarrhea"])
+#==========================================================================================================
+#
+#   QUERIES
+#
+#==========================================================================================================
 
+def get_num_responses_by_city(city, state=None, country=None):
+    # Query nominatim for the correct city name
+    time.sleep(1.5)
+    result = n.searchlocation(city=city, state=state, country=country)
+    result_city = result.get('display_name').split(",")[0].strip() if result else city
+
+    c.execute('''
+        SELECT COUNT(*) 
+        FROM responses r
+        JOIN cities c ON r.cid = c.cid
+        WHERE c.cname = ?
+    ''', (city,))
+    return c.fetchone()[0]
+
+def get_all_coordinates_and_response_counts():
+    # Returns a list of tuples (lat, lon, response_count) for all cities in the database
+    c.execute('''
+        SELECT cities.lat, cities.lon, COUNT(responses.rid) as response_count
+        FROM cities
+        LEFT JOIN responses ON cities.cid = responses.cid
+        GROUP BY cities.cid
+    ''')
+    return c.fetchall()
+
+def get_all_coordinates_and_response_counts_filtered_by_symptoms(symptoms=[]):
+    # Returns a list of tuples (lat, lon, response_count) for all cities in the database, filtered by symptoms
+    if len(symptoms) == 0:
+        return get_all_coordinates_and_response_counts()
+    
+    # Build the WHERE clause dynamically based on the provided symptoms
+    where_clauses = []
+    for symptom in symptoms:
+        where_clauses.append(f"{symptom} = 1")
+    
+    where_statement = " AND ".join(where_clauses)
+    
+    query = f'''
+        SELECT cities.lat, cities.lon, COUNT(responses.rid) as response_count
+        FROM cities
+        LEFT JOIN responses ON cities.cid = responses.cid
+        WHERE {where_statement}
+        GROUP BY cities.cid
+    '''
+    
+    c.execute(query)
+    return c.fetchall()
+
+
+
+if __name__ == "__main__":
+    # Example usage of get_num_responses_by_city from pukalani, HI
+    num_responses = get_num_responses_by_city(city="Pukalani", state="Hawaii", country="USA")
+    print(f"Number of responses for Pukalani, HI: {num_responses}")
+
+    print("\nAll coordinates and response counts:")
+    for lat, lon, count in get_all_coordinates_and_response_counts():
+        print(f"Coordinates: ({lat}, {lon}), Response Count: {count}")
+
+    print("\nAll coordinates and response counts filtered by symptoms (fever and cough_congestion):")
+    for lat, lon, count in get_all_coordinates_and_response_counts_filtered_by_symptoms(symptoms=["fever", "cough_congestion"]):
+        print(f"Coordinates: ({lat}, {lon}), Response Count: {count}")
