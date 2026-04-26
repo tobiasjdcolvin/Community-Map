@@ -4,7 +4,10 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-document.getElementById("submit-btn").addEventListener("click", async () => {
+const markerLayer = L.layerGroup().addTo(map); // add this
+
+document.getElementById("symptoms-form").addEventListener("submit", async (e) => {
+    e.preventDefault() 
     const symptoms = {
         cough_congestion: document.getElementById("cough_congestion").checked,
         nausea_vomiting:     document.getElementById("nausea_vomiting").checked,
