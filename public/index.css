@@ -76,10 +76,14 @@ legend {
 .column {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
+  text-align: left;
 }
 .column label {
   display: block;
+}
+.column input[type="text"] {
+  margin: 5px 10px 5px 30px;
 }
 .color {
   border-radius: 100%;
