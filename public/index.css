@@ -7,6 +7,7 @@
 html, body {
   margin: 0;
   padding: 0;
+  color: white;
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
@@ -22,7 +23,6 @@ header {
   margin: 0;
   top: 0;
   position: sticky;
-  color: white;
   padding: 20px;
   text-align: center;
   z-index: 100000;
@@ -45,20 +45,24 @@ main {
 }
 
 input {
-  background-color: #f0f0f090;
+  background-color: #f0f0f040;
+  color: white;
+  border: 1px solid #859dad;
+  padding: 5px;
+  border-radius: 5px;
 }
 
 article {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 10px;
 }
 
 legend {
   display: flex;
   flex-direction: column;
-  border: 2px solid #2371a5;
+  border: 1px solid #859dad;
   background-color: #596b77;
   border-radius: 10px;
   padding: 10px;
@@ -82,27 +86,29 @@ section {
 footer {
   padding: 1px;
   text-align: center;
-  background-color: #a9b8a7;
+  background: linear-gradient(to bottom right,#4d544c, #343e33);
 }
-
+select {
+  background-color: #596b77;
+  color: white;
+  border: 1px solid #859dad;
+  border-radius: 5px;
+}
 
 .box {
   border: 1px solid gray;
   height: 70vh;
-  border-radius: 5px;
+  border-radius: 15px;
   box-shadow: 0 0 10px #12476c;
   flex: 1;
 }
 form {
   background-color: #112c3e;
   border-radius: 15px;
-  width: 90vw;
   margin: 20px 0;
   padding: 20px;
-}
-
-h3 {
-  color: white;
+  border: 1px solid #12476c;
+  width: 90vw;
 }
 
 .pair {
