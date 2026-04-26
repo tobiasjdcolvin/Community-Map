@@ -6,7 +6,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 const markerLayer = L.layerGroup().addTo(map); // add this
 
-document.getElementById("submit-btn").addEventListener("click", async () => {
+document.getElementById("symptoms-form").addEventListener("submit", async (e) => {
+    e.preventDefault() 
     const symptoms = {
         cough_congestion: document.getElementById("cough_congestion").checked,
         nausea_vomiting: document.getElementById("nausea_vomiting").checked,
