@@ -17,6 +17,11 @@ body {
   flex-direction: column;
 }
 
+h4 {
+  margin: 4px 0;
+  color: #708da0;
+}
+
 header {
   box-shadow: 0 0 5px #12476c;
   background: linear-gradient(to bottom left, var(--ocean), var(--blue));
@@ -68,7 +73,14 @@ legend {
   padding: 10px;
   flex: 1;
 }
-
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.column label {
+  display: block;
+}
 .color {
   border-radius: 100%;
   min-width: 10px;
@@ -82,6 +94,7 @@ section {
   gap: 20px;
   align-items: stretch;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 footer {
@@ -109,7 +122,6 @@ form {
   margin: 20px 0;
   padding: 20px;
   border: 1px solid #12476c;
-  width: 90vw;
 }
 
 .pair {
@@ -117,4 +129,21 @@ form {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 10px;
+  color: white;
+  background-color: #12476c;
+  border: 1px solid #2371a5;
+  transition: 0.3s ease;
+}
+
+button:hover {
+  background-color: #2371a5;
+}
+
+button:active {
+  transform: scale(0.9);
 }

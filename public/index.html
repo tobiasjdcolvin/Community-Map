@@ -41,38 +41,57 @@
             </article>
         </section>
         <form id = "symptoms-form">
+            <h3>Have you experienced any of the following in the last 24 hours?</h3>
+            <section>
+                <div class="column">
+                    <h4>Oral/Respiratory</h4>
+                    <label>
+                        <input type="checkbox" id="cough_congestion">
+                        Cough or congestion
+                    </label>
+                    <label>
+                        <input type="checkbox" id="difficulty_breathing">
+                        Difficulty breathing
+                    </label>
+                    <label>
+                        <input type="checkbox" id="sore_throat">
+                        Sore throat
+                    </label>
+                </div>
+                <div class="column">
+                    <h4>Digestive</h4>
+                    <label>
+                        <input type="checkbox" id="nausea_vomiting">
+                        Nausea or vomiting
+                    </label>
+                    <label>
+                        <input type="checkbox" id="diarrhea"> diarrhea 
+                    </label>
+                </div>
+                <div class="column">
+                    <h4>General Illness</h4>
+                    <label>
+                        <input type="checkbox" id="fever"> fever
+                    </label>
+                    <label>
+                        <input type="checkbox" id="chills"> chills
+                    </label>
+                    <label>
+                        <input type="checkbox" id="rash"> rash 
+                    </label>
+                </div>
+                <div class="column">
+                    <h4>Recent Activity</h4>
+                    <label>
+                        <input type="checkbox" id="attending_a_recent_mass_gathering"> Attended a mass gethering (20+) 
+                    </label>
+                    <label>
+                        <input type="checkbox" id="history_of_travel"> Travel in the past month
+                    </label>
+                </div>
+            </section>
             <label>
-                <input type="checkbox" id="cough_congestion"> cough_congestion
-            </label>
-            <label>
-                <input type="checkbox" id="nausea_vomiting"> nausea_vomiting
-            </label>
-            <label>
-                <input type="checkbox" id="difficulty_breathing"> difficulty_breathing
-            </label>
-            <label>
-                <input type="checkbox" id="sore_throat"> sore_throat
-            </label>
-            <label>
-                <input type="checkbox" id="rash"> rash 
-            </label>
-            <label>
-                <input type="checkbox" id="fever"> fever
-            </label>
-            <label>
-                <input type="checkbox" id="chills"> chills
-            </label>
-            <label>
-                <input type="checkbox" id="diarrhea"> diarrhea 
-            </label>
-            <label>
-                <input type="checkbox" id="attending_a_recent_mass_gathering"> attending_a_recent_mass_gathering 
-            </label>
-            <label>
-                <input type="checkbox" id="history_of_travel"> history_of_travel
-            </label
-            <label>
-                <input type="submit" id="submit-btn"> Submit Survey
+                <button type="submit" id="submit-btn"> Submit Survey </button>
             </label>
         </form>
     </main>
