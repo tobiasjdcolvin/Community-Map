@@ -73,7 +73,8 @@ legend {
   border-radius: 100%;
   min-width: 10px;
   min-height: 10px;
-  border: 1px solid white;
+  border-width: 1px;
+  border-style: solid;
 }
 section {
   width: 90vw;
